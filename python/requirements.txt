@@ -1,2 +1,2 @@
 numpy>=1.11.0
-pytest>=9.0.1
+pybind_stubgen>=2.5.1

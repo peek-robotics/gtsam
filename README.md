@@ -2,6 +2,12 @@
 [![C++ API](https://img.shields.io/badge/API-C%2B%2B-blue.svg)](https://gtsam.org/doxygen/)
 [![Docs](https://img.shields.io/badge/Docs-Python%20%7C%20C%2B%2B-green.svg)](https://borglab.github.io/gtsam/)
 
+**PR MODIFICATIONS**
+
+This has been modified so that the python bindings will build for our antique ROS1 env (Ubuntu 20.04, Python 3.8)
+
+[Info here](python/README.md)
+
 **Important Note**
 
 **The `develop` branch is officially in "Pre 4.3" mode. We envision several API-breaking changes as we switch to C++17 and away from boost.**

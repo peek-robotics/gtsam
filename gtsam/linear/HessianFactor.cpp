@@ -37,8 +37,8 @@
 #ifdef GTSAM_USE_TBB
   #include <tbb/blocked_range.h>
   #include <tbb/parallel_for.h>
-  #include <oneapi/tbb/global_control.h>
-  #include <oneapi/tbb/task_arena.h>
+  #include <tbb/global_control.h>
+  #include <tbb/task_arena.h>
   #include <algorithm>
 #endif
 
@@ -261,9 +261,9 @@ HessianFactor::HessianFactor(const GaussianFactorGraph& factors,
     const DenseIndex M = info_.nBlocks();
 
     auto numThreads = std::min(
-        static_cast<int>(oneapi::tbb::global_control::active_value(
-            oneapi::tbb::global_control::max_allowed_parallelism)),
-        static_cast<int>(oneapi::tbb::this_task_arena::max_concurrency()));
+        static_cast<int>(tbb::global_control::active_value(
+            tbb::global_control::max_allowed_parallelism)),
+        static_cast<int>(tbb::this_task_arena::max_concurrency()));
 
     if (numThreads > 1) {
       DenseIndex grain = std::max<DenseIndex>(1, M / (2 * numThreads));

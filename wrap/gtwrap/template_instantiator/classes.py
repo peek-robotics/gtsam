@@ -1,5 +1,7 @@
 """Instantiate a class and its members."""
 
+from __future__ import annotations
+
 import gtwrap.interface_parser as parser
 from gtwrap.template_instantiator.constructor import InstantiatedConstructor
 from gtwrap.template_instantiator.helpers import (InstantiatedMember,

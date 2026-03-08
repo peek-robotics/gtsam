@@ -1,5 +1,19 @@
 # README
 
+# PR mods
+
+In order to build on a ROS1 / Ubuntu 20.04 / Python 3.8 env, we have messed with some of the bindings for typing compatibility.
+
+Your exact setup may require different tweaks, but here's what I did:
+
+- Get a modern-ish cmake, anything over 3.22 should do: [https://cmake.org/download/](https://cmake.org/download/)
+- Get a modern oneTBB: [https://github.com/uxlfoundation/oneTBB/releases](https://github.com/uxlfoundation/oneTBB/releases)
+- install reqs: `pip install -r gtsam/python/requirements.txt`
+- build with `cmake .. -DGTSAM_BUILD_PYTHON=1 -DGTSAM_PYTHON_VERSION=3.8`
+- install with `make python-install`
+- install gtsam if you want with `sudo make install` (optional, but it will make the gtsam module available globally)
+  
+
 # Python Wrapper
 
 This is the Python wrapper around the GTSAM C++ library. We use our custom [wrap library](https://github.com/borglab/wrap) to generate the bindings to the underlying C++ code.

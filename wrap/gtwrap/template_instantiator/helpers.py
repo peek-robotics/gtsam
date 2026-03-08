@@ -1,5 +1,7 @@
 """Various helpers for instantiation."""
 
+from __future__ import annotations
+
 import itertools
 from copy import deepcopy
 from typing import Sequence, Union

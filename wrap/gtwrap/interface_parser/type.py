@@ -12,6 +12,8 @@ Author: Duy Nguyen Ta, Fan Jiang, Matthew Sklar, Varun Agrawal, and Frank Dellae
 
 # pylint: disable=unnecessary-lambda, expression-not-assigned
 
+from __future__ import annotations
+
 from typing import List, Sequence, Union
 
 from pyparsing import ParseResults  # type: ignore
@@ -302,8 +304,16 @@ class TemplatedType:
     @staticmethod
     def from_parse_result(t: ParseResults):
         """Get the TemplatedType from the parser results."""
-        return TemplatedType(t.typename, t.template_params.as_list(),
-                             t.is_const, t.is_shared_ptr, t.is_ptr, t.is_ref)
+        template_params = t.template_params
+        if hasattr(template_params, "asList"):
+            template_params_list = template_params.asList()
+        elif hasattr(template_params, "as_list") and callable(template_params.as_list):
+            template_params_list = template_params.as_list()
+        else:
+            template_params_list = list(template_params)
+
+        return TemplatedType(t.typename, template_params_list, t.is_const,
+                             t.is_shared_ptr, t.is_ptr, t.is_ref)
 
     def __repr__(self):
         return "TemplatedType({typename.namespaces}::{typename.name}<{template_params}>)".format(
