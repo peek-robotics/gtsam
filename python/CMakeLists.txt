@@ -31,6 +31,26 @@ macro(SET_PYTHON_TARGET_PROPERTIES PYTHON_TARGET OUTPUT_NAME OUTPUT_DIRECTORY)
     )
 endmacro()
 
+if(UNIX)
+    set(GTSAM_PYTHON_PATH_SEPARATOR ":")
+else()
+    set(GTSAM_PYTHON_PATH_SEPARATOR ";")
+endif()
+
+set(GTSAM_PYTHON_ENV_PYTHONPATH
+    "PYTHONPATH=${GTSAM_PYTHON_BUILD_DIRECTORY}${GTSAM_PYTHON_PATH_SEPARATOR}$ENV{PYTHONPATH}")
+
+if(UNIX AND NOT APPLE)
+    set(GTSAM_PYTHON_RUNTIME_LIBRARY_PATH
+        "${PROJECT_BINARY_DIR}/gtsam"
+        "${PROJECT_BINARY_DIR}/gtsam_unstable"
+        "${PROJECT_BINARY_DIR}/gtsam/3rdparty/metis/libmetis"
+        "${PROJECT_BINARY_DIR}/gtsam/3rdparty/cephes")
+    list(JOIN GTSAM_PYTHON_RUNTIME_LIBRARY_PATH ":" GTSAM_PYTHON_RUNTIME_LIBRARY_PATH_JOINED)
+    set(GTSAM_PYTHON_ENV_LIBRARY_PATH
+        "LD_LIBRARY_PATH=${GTSAM_PYTHON_RUNTIME_LIBRARY_PATH_JOINED}${GTSAM_PYTHON_PATH_SEPARATOR}$ENV{LD_LIBRARY_PATH}")
+endif()
+
 ############################################################
 ## Load the necessary files to compile the wrapper
 
@@ -313,8 +333,9 @@ if(GTSAM_UNSTABLE_BUILD_PYTHON)
         python-unstable-stubs
         COMMAND
         ${CMAKE_COMMAND} -E env
-        "PYTHONPATH=${GTSAM_PYTHON_BUILD_DIRECTORY}/$ENV{PYTHONPATH}"
-        pybind11-stubgen -o . --enum-class-locations \"KernelFunctionType|NoiseFormat:gtsam.gtsam\" --enum-class-locations \"OrderingType:gtsam.gtsam.Ordering\" --numpy-array-use-type-var --ignore-all-errors gtsam_unstable
+        ${GTSAM_PYTHON_ENV_PYTHONPATH}
+        ${GTSAM_PYTHON_ENV_LIBRARY_PATH}
+        ${PYTHON_EXECUTABLE} -m pybind11_stubgen -o . --enum-class-locations \"KernelFunctionType|NoiseFormat:gtsam.gtsam\" --enum-class-locations \"OrderingType:gtsam.gtsam.Ordering\" --numpy-array-use-type-var --ignore-all-errors gtsam_unstable
         DEPENDS ${GTSAM_PYTHON_DEPENDENCIES} ${GTSAM_PYTHON_TEST_FILES} ${GTSAM_PYTHON_UNSTABLE_TARGET}
         WORKING_DIRECTORY "${GTSAM_PYTHON_BUILD_DIRECTORY}/"
     )
@@ -329,7 +350,8 @@ if(GTSAM_UNSTABLE_BUILD_PYTHON)
         python-test-unstable
         COMMAND
           ${CMAKE_COMMAND} -E env # add package to python path so no need to install
-          "PYTHONPATH=${GTSAM_PYTHON_BUILD_DIRECTORY}/$ENV{PYTHONPATH}"
+                    ${GTSAM_PYTHON_ENV_PYTHONPATH}
+                    ${GTSAM_PYTHON_ENV_LIBRARY_PATH}
         ${PYTHON_EXECUTABLE} -m pytest -v . ${PYTEST_EXTRA_ARGS_LIST}
         DEPENDS ${GTSAM_PYTHON_DEPENDENCIES} ${GTSAM_PYTHON_TEST_FILES}
         WORKING_DIRECTORY "${GTSAM_PYTHON_BUILD_DIRECTORY}/gtsam_unstable/tests"
@@ -340,7 +362,8 @@ add_custom_target(
         python-stubs
         COMMAND
           ${CMAKE_COMMAND} -E env
-          "PYTHONPATH=${GTSAM_PYTHON_BUILD_DIRECTORY}/$ENV{PYTHONPATH}"
+                    ${GTSAM_PYTHON_ENV_PYTHONPATH}
+                    ${GTSAM_PYTHON_ENV_LIBRARY_PATH}
         ${PYTHON_EXECUTABLE} -m pybind11_stubgen -o . --enum-class-locations \"KernelFunctionType|NoiseFormat:gtsam.gtsam\" --enum-class-locations \"OrderingType:gtsam.gtsam.Ordering\" --numpy-array-use-type-var --ignore-all-errors gtsam
         DEPENDS ${GTSAM_PYTHON_DEPENDENCIES} ${GTSAM_PYTHON_TEST_FILES} ${GTSAM_PYTHON_TARGET}
         WORKING_DIRECTORY "${GTSAM_PYTHON_BUILD_DIRECTORY}/"

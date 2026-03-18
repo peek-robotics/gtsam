@@ -282,9 +282,8 @@ template <typename T, int Dim>
 typename traits<T>::TangentVector ProductLieGroup<G, H>::tangentSegment(
     const TangentVector& v, size_t start, size_t runtimeDimension) {
   const int startIndex = static_cast<int>(start);
-  const int runtimeIndex = static_cast<int>(runtimeDimension);
   if constexpr (Dim == Eigen::Dynamic) {
-    return v.segment(startIndex, runtimeIndex);
+    return v.segment(startIndex, static_cast<int>(runtimeDimension));
   } else {
     static_cast<void>(runtimeDimension);
     return v.template segment<Dim>(startIndex);
